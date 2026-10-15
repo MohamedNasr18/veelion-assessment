@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { ActivityLog } from "@/types/api";
 
@@ -33,7 +32,7 @@ export default function ActivityPage() {
         setLoading(true);
         setError("");
         const response = await fetch("/api/activity");
-        
+
         if (!response.ok) {
           throw new Error("Failed to load activities");
         }
@@ -61,21 +60,33 @@ export default function ActivityPage() {
 
   return (
     <main className="stack">
-      <nav>
-        <Link href="/" className="button">
-          Back
-        </Link>
-      </nav>
 
-      <section className="card" style={{ padding: "1rem" }}>
-        <h1 style={{ marginTop: 0, marginBottom: "0.5rem" }}>Activity Feed</h1>
+      <div className="card" style={{ padding: "1.5rem" }}>
+        <div className="page-header" style={{ marginBottom: "1.1rem" }}>
+          <h1 className="page-title">Activity Feed</h1>
+          <p className="page-subtitle">Browse and search recent activity logs</p>
+        </div>
 
         <div style={{ position: "relative" }}>
+          <span
+            style={{
+              position: "absolute",
+              left: "0.85rem",
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: "var(--muted)",
+              pointerEvents: "none",
+              fontSize: "0.9rem",
+            }}
+          >
+            🔍
+          </span>
           <input
             className="input"
-            placeholder="Search activity"
+            placeholder="Search by action or info…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ paddingLeft: "2.3rem" }}
           />
           {searchQuery && (
             <button
@@ -83,14 +94,17 @@ export default function ActivityPage() {
               onClick={handleClearSearch}
               style={{
                 position: "absolute",
-                right: "0.5rem",
+                right: "0.6rem",
                 top: "50%",
                 transform: "translateY(-50%)",
-                background: "none",
-                border: "none",
+                background: "var(--surface-2)",
+                border: "1px solid var(--border)",
+                borderRadius: "4px",
                 cursor: "pointer",
-                padding: "0.25rem",
+                padding: "0.15rem 0.4rem",
                 color: "var(--muted)",
+                fontSize: "0.72rem",
+                lineHeight: 1,
               }}
               aria-label="Clear search"
             >
@@ -98,51 +112,79 @@ export default function ActivityPage() {
             </button>
           )}
         </div>
-      </section>
 
-      <section className="card" style={{ padding: "1rem" }}>
-        <small style={{ color: "var(--muted)" }}>
-          Total: {activities.length} | Showing: {filteredActivities.length}
-        </small>
-      </section>
+        {!loading && !error && (
+          <div style={{ marginTop: "0.85rem", display: "flex", gap: "1.25rem" }}>
+            <span style={{ fontSize: "0.8rem", color: "var(--muted)" }}>
+              Total:{" "}
+              <strong style={{ color: "var(--text-soft)" }}>{activities.length}</strong>
+            </span>
+            <span style={{ fontSize: "0.8rem", color: "var(--muted)" }}>
+              Showing:{" "}
+              <strong style={{ color: "var(--primary)" }}>{filteredActivities.length}</strong>
+            </span>
+          </div>
+        )}
+      </div>
 
-      {loading ? (
-        <section className="card" style={{ padding: "1rem" }}>
-          <p style={{ margin: 0 }}>Loading activities...</p>
-        </section>
-      ) : null}
+      {loading && (
+        <div className="card" style={{ padding: "1.5rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <div className="spinner" />
+            <span style={{ color: "var(--muted)", fontSize: "0.9rem" }}>
+              Loading activities…
+            </span>
+          </div>
+        </div>
+      )}
 
-      {error ? (
-        <section className="card" style={{ padding: "1rem", borderColor: "#e3b4c0", background: "#fff8fa" }}>
-          <p style={{ margin: 0, color: "var(--danger)" }}>{error}</p>
-        </section>
-      ) : null}
+      {error && (
+        <div className="alert alert-danger animate-in">
+          <span>⚠</span>
+          <span>{error}</span>
+        </div>
+      )}
 
-      {!loading && !error && filteredActivities.length === 0 && searchQuery ? (
-        <section className="card" style={{ padding: "1rem" }}>
-          <p style={{ margin: 0, color: "var(--muted)" }}>No activities match your search.</p>
-        </section>
-      ) : null}
+      {!loading && !error && filteredActivities.length === 0 && searchQuery && (
+        <div className="card animate-in">
+          <div className="empty-state">
+            <div className="empty-icon">🔍</div>
+            <div className="empty-title">No matching activities</div>
+            <div className="empty-desc">Try a different search term.</div>
+          </div>
+        </div>
+      )}
 
-      {!loading && !error && activities.length === 0 ? (
-        <section className="card" style={{ padding: "1rem" }}>
-          <p style={{ margin: 0, color: "var(--muted)" }}>No activity logs yet.</p>
-        </section>
-      ) : null}
+      {!loading && !error && activities.length === 0 && (
+        <div className="card">
+          <div className="empty-state">
+            <div className="empty-icon">📋</div>
+            <div className="empty-title">No activity yet</div>
+            <div className="empty-desc">Activity logs will appear here once available.</div>
+          </div>
+        </div>
+      )}
 
-      {!loading && !error && filteredActivities.length > 0 ? (
-        <section className="card" style={{ padding: "1rem" }}>
-          <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: "0.7rem" }}>
-            {filteredActivities.map((item) => (
-              <li key={item.id} style={{ borderBottom: "1px solid var(--border)", paddingBottom: "0.6rem" }}>
-                <div style={{ fontWeight: 600 }}>{item.action || "(no action)"}</div>
-                <div>{item.info || "(no info)"}</div>
-                <small style={{ color: "var(--muted)" }}>{formatTimestamp(item.when)}</small>
+      {!loading && !error && filteredActivities.length > 0 && (
+        <div className="card" style={{ padding: "0 1.25rem" }}>
+          <ul className="activity-list">
+            {filteredActivities.map((item, idx) => (
+              <li
+                key={item.id}
+                className="activity-item"
+                style={{ animationDelay: `${idx * 0.03}s` }}
+              >
+                <div className="activity-dot" />
+                <div className="activity-content">
+                  <div className="activity-action">{item.action || "(no action)"}</div>
+                  <div className="activity-info">{item.info || "(no info)"}</div>
+                  <div className="activity-when">{formatTimestamp(item.when)}</div>
+                </div>
               </li>
             ))}
           </ul>
-        </section>
-      ) : null}
+        </div>
+      )}
     </main>
   );
 }

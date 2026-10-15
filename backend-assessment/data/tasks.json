@@ -2,17 +2,17 @@
   {
     "id": "aeccf602-2809-4802-985b-70ff86942377",
     "title": "Test task",
-    "completed": true,
+    "completed": false,
     "createdAt": "2026-04-08T09:39:57.432Z",
-    "updatedAt": "2026-10-15T11:10:58.190Z",
-    "status": "done"
+    "updatedAt": "2026-10-15T14:03:56.662Z",
+    "status": "todo"
   },
   {
     "id": "9a749a2d-ec52-415e-b68d-3c16a6ed024d",
     "title": "degraded task",
     "completed": false,
     "createdAt": "2026-04-08T09:49:54.480Z",
-    "updatedAt": "2026-10-15T11:38:12.506Z",
+    "updatedAt": "2026-10-15T14:03:49.025Z",
     "status": "in-progress"
   },
   {
@@ -28,15 +28,15 @@
     "title": "Refactoring task",
     "completed": false,
     "createdAt": "2026-10-14T08:08:49.366Z",
-    "updatedAt": "2026-10-15T10:18:01.592Z",
-    "status": "todo"
+    "updatedAt": "2026-10-15T14:02:08.661Z",
+    "status": "in-progress"
   },
   {
     "id": "70cd7317-67bf-459e-9be6-c9048a280dbc",
     "title": "Testtt task",
     "completed": true,
     "createdAt": "2026-10-14T15:26:31.546Z",
-    "updatedAt": "2026-10-15T10:18:22.409Z",
+    "updatedAt": "2026-10-15T14:19:26.562Z",
     "status": "done"
   }
 ]

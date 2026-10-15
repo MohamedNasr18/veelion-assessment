@@ -38,40 +38,57 @@ export function TaskDashboard() {
 
   return (
     <section className="stack">
-      <header className="card" style={{ padding: "1rem" }}>
-        <h1 style={{ marginTop: 0, marginBottom: "0.5rem" }}>Task Dashboard</h1>
-      </header>
+
+      <div className="card" style={{ padding: "1.5rem" }}>
+        <div className="page-header">
+          <h1 className="page-title">Task Dashboard</h1>
+          <p className="page-subtitle">Manage and update your tasks</p>
+        </div>
+      </div>
 
       <StatusFilter value={filter} onChange={setFilter} />
 
-      {successMessage ? (
-        <section className="card" style={{ padding: "1rem", borderColor: "#a8d5ba", background: "#f0fdf4" }}>
-          <p style={{ margin: 0, color: "#166534" }}>✓ {successMessage}</p>
-        </section>
-      ) : null}
+      {successMessage && (
+        <div className="alert alert-success animate-in">
+          <span>✓</span>
+          <span>{successMessage}</span>
+        </div>
+      )}
 
-      {loading ? (
-        <section className="card" style={{ padding: "1rem" }}>
-          <p style={{ margin: 0 }}>Loading tasks...</p>
-        </section>
-      ) : null}
+      {loading && (
+        <div className="card" style={{ padding: "1.5rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <div className="spinner" />
+            <span style={{ color: "var(--muted)", fontSize: "0.9rem" }}>Loading tasks…</span>
+          </div>
+        </div>
+      )}
 
-      {error ? (
-        <section className="card" style={{ padding: "1rem", borderColor: "#e3b4c0", background: "#fff8fa" }}>
-          <p style={{ marginTop: 0, marginBottom: "0.75rem", color: "var(--danger)" }}>{error}</p>
+      {error && (
+        <div
+          className="card"
+          style={{
+            padding: "1.25rem",
+            borderColor: "rgba(248,113,113,0.3)",
+            background: "var(--danger-dim)",
+          }}
+        >
+          <p style={{ marginTop: 0, marginBottom: "0.75rem", color: "var(--danger)", fontSize: "0.9rem" }}>
+            {error}
+          </p>
           <button type="button" className="button" onClick={fetchTasks}>
             Retry
           </button>
-        </section>
-      ) : null}
+        </div>
+      )}
 
-      {!loading && !error ? (
+      {!loading && !error && (
         <TaskList
           tasks={filteredTasks}
           updatingTaskId={updatingTaskId}
           onStatusChange={handleStatusChange}
         />
-      ) : null}
+      )}
     </section>
   );
 }
