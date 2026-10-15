@@ -18,18 +18,18 @@
   {
     "id": "4398f26b-f527-4eeb-b74c-cd4c0ecc9060",
     "title": "A new task",
-    "completed": false,
+    "completed": true,
     "createdAt": "2026-04-08T10:11:56.354Z",
-    "updatedAt": "2026-10-15T10:18:13.695Z",
-    "status": "in-progress"
+    "updatedAt": "2026-10-15T14:51:01.422Z",
+    "status": "done"
   },
   {
     "id": "5fc568ea-ac84-45b5-8bd3-65125532e49f",
     "title": "Refactoring task",
     "completed": false,
     "createdAt": "2026-10-14T08:08:49.366Z",
-    "updatedAt": "2026-10-15T14:02:08.661Z",
-    "status": "in-progress"
+    "updatedAt": "2026-10-15T15:53:31.872Z",
+    "status": "todo"
   },
   {
     "id": "70cd7317-67bf-459e-9be6-c9048a280dbc",

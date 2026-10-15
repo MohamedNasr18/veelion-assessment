@@ -1,5 +1,7 @@
 export type TaskStatus = "todo" | "in-progress" | "done";
 
+export type TaskFilter = "all" | TaskStatus;
+
 export type Task = {
   id: string;
   title: string;
@@ -37,4 +39,5 @@ export type ErrorResponse = {
 export type TasksSummary = {
   total: number;
   byStatus: Record<TaskStatus, number>;
+  recentActivityCount: number;
 };
