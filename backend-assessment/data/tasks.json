@@ -4,20 +4,39 @@
     "title": "Test task",
     "completed": true,
     "createdAt": "2026-04-08T09:39:57.432Z",
-    "updatedAt": "2026-04-08T09:39:57.579Z"
+    "updatedAt": "2026-10-15T11:10:58.190Z",
+    "status": "done"
   },
   {
     "id": "9a749a2d-ec52-415e-b68d-3c16a6ed024d",
     "title": "degraded task",
-    "completed": true,
+    "completed": false,
     "createdAt": "2026-04-08T09:49:54.480Z",
-    "updatedAt": "2026-04-08T09:49:54.497Z"
+    "updatedAt": "2026-10-15T11:38:12.506Z",
+    "status": "in-progress"
   },
   {
     "id": "4398f26b-f527-4eeb-b74c-cd4c0ecc9060",
     "title": "A new task",
     "completed": false,
     "createdAt": "2026-04-08T10:11:56.354Z",
-    "updatedAt": "2026-04-08T10:11:56.354Z"
+    "updatedAt": "2026-10-15T10:18:13.695Z",
+    "status": "in-progress"
+  },
+  {
+    "id": "5fc568ea-ac84-45b5-8bd3-65125532e49f",
+    "title": "Refactoring task",
+    "completed": false,
+    "createdAt": "2026-10-14T08:08:49.366Z",
+    "updatedAt": "2026-10-15T10:18:01.592Z",
+    "status": "todo"
+  },
+  {
+    "id": "70cd7317-67bf-459e-9be6-c9048a280dbc",
+    "title": "Testtt task",
+    "completed": true,
+    "createdAt": "2026-10-14T15:26:31.546Z",
+    "updatedAt": "2026-10-15T10:18:22.409Z",
+    "status": "done"
   }
 ]

@@ -19,7 +19,17 @@ function errorHandler(error, req, res, next) {
   }
 
   if (statusCode >= 500) {
-    console.error(error);
+    const isDevelopment = process.env.NODE_ENV !== 'production';
+    
+    if (isDevelopment) {
+      console.error('Error details:', error);
+    } else {
+      console.error('Internal error occurred:', {
+        message: error.message,
+        statusCode,
+        timestamp: new Date().toISOString(),
+      });
+    }
   }
 
   return res.status(statusCode).json(response);

@@ -1,7 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { ErrorResponse, Task, TaskFilter, TaskResponse, TasksResponse } from "@/types/api";
+import type {
+  ErrorResponse,
+  Task,
+  TaskFilter,
+  TaskResponse,
+  TaskStatus,
+  TasksResponse,
+} from "@/types/api";
 
 function getErrorMessage(error: unknown, fallback: string): string {
   if (error instanceof Error) {
@@ -21,12 +28,15 @@ async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
+    let message = `Request failed with ${response.status}`;
+
     try {
       const body = (await response.json()) as ErrorResponse;
-      throw new Error(body.error?.message || `Request failed with ${response.status}`);
-    } catch (error) {
-      throw new Error(getErrorMessage(error, `Request failed with ${response.status}`));
+      message = body.error?.message || message;
+    } catch {
     }
+
+    throw new Error(message);
   }
 
   return (await response.json()) as T;
@@ -56,21 +66,23 @@ export function useTasks() {
     }
   }, []);
 
-  const updateTaskStatus = useCallback(async (taskId: string, completed: boolean) => {
+    const updateTaskStatus = useCallback(async (taskId: string, status: TaskStatus) => {
     try {
       setUpdatingTaskId(taskId);
       setError("");
 
       const body = await requestJson<TaskResponse>(`/api/tasks/${taskId}`, {
         method: "PATCH",
-        body: JSON.stringify({ completed }),
+        body: JSON.stringify({ status }),
       });
 
       setTasks((previous) =>
         previous.map((task) => (task.id === taskId ? body.data : task))
       );
+      return true;
     } catch (error) {
       setError(getErrorMessage(error, "Could not update task status."));
+      return false;
     } finally {
       setUpdatingTaskId("");
     }
@@ -81,15 +93,11 @@ export function useTasks() {
   }, [fetchTasks]);
 
   const filteredTasks = useMemo(() => {
-    if (filter === "completed") {
-      return tasks.filter((task) => task.completed);
+    if (filter === "all") {
+      return tasks;
     }
 
-    if (filter === "pending") {
-      return tasks.filter((task) => !task.completed);
-    }
-
-    return tasks;
+    return tasks.filter((task) => task.status === filter);
   }, [tasks, filter]);
 
   return {

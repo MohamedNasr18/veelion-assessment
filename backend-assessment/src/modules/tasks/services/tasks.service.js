@@ -3,8 +3,9 @@ const path = require('node:path');
 const { createId } = require('../../../utils/id');
 const { readJsonArray, writeJsonArray } = require('../../../utils/jsonStore');
 const HttpError = require('../../../utils/httpError');
+const { DATA_DIR, TASKS_FILE, TASK_STATUS } = require('../../../utils/constants');
 
-const TASKS_FILE_PATH = path.join(process.cwd(), 'data', 'tasks.json');
+const TASKS_FILE_PATH = path.join(process.cwd(), DATA_DIR, TASKS_FILE);
 
 function buildTaskRecord(payload) {
   const now = new Date().toISOString();
@@ -12,14 +13,42 @@ function buildTaskRecord(payload) {
   return {
     id: createId(),
     title: payload.title,
-    completed: payload.completed,
+    status: payload.status || TASK_STATUS.TODO,
+    completed: payload.status === TASK_STATUS.DONE,
     createdAt: now,
     updatedAt: now,
   };
 }
 
-async function getAllTasks() {
-  return readJsonArray(TASKS_FILE_PATH);
+async function getAllTasks(options = {}) {
+  const allTasks = await readJsonArray(TASKS_FILE_PATH);
+  
+  // If no pagination, return all
+  if (!options.page && !options.limit) {
+    return {
+      data: allTasks,
+      total: allTasks.length,
+    };
+  }
+
+  const page = parseInt(options.page) || 1;
+  const limit = parseInt(options.limit) || 10;
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+
+  const paginatedTasks = allTasks.slice(startIndex, endIndex);
+
+  return {
+    data: paginatedTasks,
+    pagination: {
+      page,
+      limit,
+      total: allTasks.length,
+      totalPages: Math.ceil(allTasks.length / limit),
+      hasNext: endIndex < allTasks.length,
+      hasPrev: page > 1,
+    },
+  };
 }
 
 async function getTaskById(taskId) {
@@ -34,18 +63,6 @@ async function getTaskById(taskId) {
 }
 
 async function createTask(payload) {
-  if (!payload.title || typeof payload.title !== 'string') {
-    throw new HttpError(400, 'Invalid title.');
-  }
-
-  if (payload.completed !== undefined && typeof payload.completed !== 'boolean') {
-    throw new HttpError(400, 'Invalid completed value.');
-  }
-
-  if (payload.completed === undefined) {
-    payload.completed = false;
-  }
-
   const tasks = await readJsonArray(TASKS_FILE_PATH);
   const newTask = buildTaskRecord(payload);
 
@@ -56,14 +73,6 @@ async function createTask(payload) {
 }
 
 async function updateTask(taskId, updates) {
-  if (typeof updates.title === 'string' && updates.title.length < 2) {
-    throw new HttpError(400, 'Title is too short.');
-  }
-
-  if (updates.completed !== undefined && typeof updates.completed !== 'boolean') {
-    throw new HttpError(400, 'completed must be boolean');
-  }
-
   const tasks = await readJsonArray(TASKS_FILE_PATH);
   const taskIndex = tasks.findIndex((item) => item.id === taskId);
 

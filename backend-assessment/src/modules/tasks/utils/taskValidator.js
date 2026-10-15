@@ -1,89 +1,90 @@
 const HttpError = require('../../../utils/httpError');
+const { sanitizeTaskInput } = require('../../../utils/sanitize');
+const { MIN_TITLE_LENGTH, MAX_TITLE_LENGTH, TASK_STATUS, VALID_TASK_STATUSES } = require('../../../utils/constants');
 
-const ALLOWED_FIELDS = ['title', 'completed'];
-
-function validatePayloadShape(payload) {
+function validateTaskPayload(payload) {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
-    throw new HttpError(400, 'Body must be a JSON object.');
+    throw new HttpError(400, 'Request body must be an object.');
   }
+
+  const sanitized = sanitizeTaskInput(payload);
+
+  if (typeof sanitized.title !== 'string') {
+    throw new HttpError(400, 'Title is required and must be a string.');
+  }
+
+  const trimmedTitle = sanitized.title.trim();
+  if (!trimmedTitle || trimmedTitle.length < MIN_TITLE_LENGTH) {
+    throw new HttpError(400, 'Title cannot be empty.');
+  }
+
+  if (trimmedTitle.length > MAX_TITLE_LENGTH) {
+    throw new HttpError(400, `Title cannot exceed ${MAX_TITLE_LENGTH} characters.`);
+  }
+
+     if (sanitized.status !== undefined) {
+    if (!VALID_TASK_STATUSES.includes(sanitized.status)) {
+      throw new HttpError(400, `Status must be one of: ${VALID_TASK_STATUSES.join(', ')}`);
+    }
+    sanitized.completed = sanitized.status === TASK_STATUS.DONE;
+  } else if (sanitized.completed !== undefined) {
+    if (typeof sanitized.completed !== 'boolean') {
+      throw new HttpError(400, 'Completed must be a boolean.');
+    }
+    sanitized.status = sanitized.completed ? TASK_STATUS.DONE : TASK_STATUS.TODO;
+  }
+
+  const status = sanitized.status ?? TASK_STATUS.TODO;
+
+  return {
+    title: trimmedTitle,
+    status,
+    completed: status === TASK_STATUS.DONE,
+  };
+
 }
 
-function ensureNoUnknownFields(payload) {
-  const unknownFields = Object.keys(payload).filter(
-    (field) => !ALLOWED_FIELDS.includes(field)
-  );
-
-  if (unknownFields.length > 0) {
-    throw new HttpError(400, 'Body contains unsupported fields.', {
-      unsupportedFields: unknownFields,
-    });
-  }
-}
-
-function normalizeTitleIfPresent(payload, normalized) {
-  if (!Object.hasOwn(payload, 'title')) {
-    return;
+function validateTaskUpdate(updates) {
+  if (!updates || typeof updates !== 'object' || Array.isArray(updates)) {
+    throw new HttpError(400, 'Request body must be an object.');
   }
 
-  if (typeof payload.title !== 'string') {
-    throw new HttpError(400, '"title" must be a string.');
+  const sanitized = sanitizeTaskInput(updates);
+
+  if (sanitized.title !== undefined && typeof sanitized.title !== 'string') {
+    throw new HttpError(400, 'Title must be a string.');
   }
 
-  const trimmedTitle = payload.title.trim();
-  if (!trimmedTitle) {
-    throw new HttpError(400, '"title" cannot be empty.');
+  if (sanitized.title !== undefined) {
+    sanitized.title = sanitized.title.trim();
+    if (sanitized.title.length === 0) {
+      throw new HttpError(400, 'Title cannot be empty.');
+    }
+    if (sanitized.title.length > MAX_TITLE_LENGTH) {
+      throw new HttpError(400, `Title cannot exceed ${MAX_TITLE_LENGTH} characters.`);
+    }
   }
 
-  normalized.title = trimmedTitle;
-}
-
-function normalizeCompletedIfPresent(payload, normalized) {
-  if (!Object.hasOwn(payload, 'completed')) {
-    return;
+    if (sanitized.status !== undefined) {
+    if (!VALID_TASK_STATUSES.includes(sanitized.status)) {
+      throw new HttpError(400, `Status must be one of: ${VALID_TASK_STATUSES.join(', ')}`);
+    }
+    sanitized.completed = sanitized.status === TASK_STATUS.DONE;
+  } else if (sanitized.completed !== undefined) {
+    if (typeof sanitized.completed !== 'boolean') {
+      throw new HttpError(400, 'Completed must be a boolean.');
+    }
+    sanitized.status = sanitized.completed ? TASK_STATUS.DONE : TASK_STATUS.TODO;
   }
 
-  if (typeof payload.completed !== 'boolean') {
-    throw new HttpError(400, '"completed" must be a boolean.');
+  if (sanitized.title === undefined && sanitized.status === undefined && sanitized.completed === undefined) {
+    throw new HttpError(400, 'Nothing to update - provide title, status, or completed.');
   }
 
-  normalized.completed = payload.completed;
-}
-
-function validateCreateTask(payload) {
-  validatePayloadShape(payload);
-  ensureNoUnknownFields(payload);
-
-  const normalized = {};
-  normalizeTitleIfPresent(payload, normalized);
-  normalizeCompletedIfPresent(payload, normalized);
-
-  if (!Object.hasOwn(normalized, 'title')) {
-    throw new HttpError(400, '"title" is required.');
-  }
-
-  if (!Object.hasOwn(normalized, 'completed')) {
-    normalized.completed = false;
-  }
-
-  return normalized;
-}
-
-function validateUpdateTask(payload) {
-  validatePayloadShape(payload);
-  ensureNoUnknownFields(payload);
-
-  const normalized = {};
-  normalizeTitleIfPresent(payload, normalized);
-  normalizeCompletedIfPresent(payload, normalized);
-
-  if (Object.keys(normalized).length === 0) {
-    throw new HttpError(400, 'Provide at least one updatable field.');
-  }
-
-  return normalized;
+  return sanitized;
 }
 
 module.exports = {
-  validateCreateTask,
-  validateUpdateTask,
+  validateTaskPayload,
+  validateTaskUpdate,
 };

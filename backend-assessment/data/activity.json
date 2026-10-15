@@ -16,5 +16,17 @@
     "action": "added a task",
     "info": "D",
     "when": "2026-04-08T10:13:56.616Z"
+  },
+  {
+    "id": "1a23a7b2-31c8-4dd9-90a7-912718f6e4db",
+    "action": "test refactor",
+    "info": "checking validation",
+    "when": "2026-10-14T08:08:15.404Z"
+  },
+  {
+    "id": "4c919fe1-225e-4a5e-b392-dd707935dbfc",
+    "action": "Testaction",
+    "info": "badinfo",
+    "when": "2026-10-14T15:26:45.781Z"
   }
 ]

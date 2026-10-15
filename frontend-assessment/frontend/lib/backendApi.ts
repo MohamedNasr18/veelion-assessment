@@ -1,5 +1,5 @@
 import { BACKEND_BASE_URL } from "@/lib/constants";
-import type { ActivityLog, ErrorResponse, Task, TaskResponse, TasksResponse } from "@/types/api";
+import type { ActivityLog, ActivityResponse, ErrorResponse, Task, TaskResponse, TasksResponse, TaskStatus } from "@/types/api";
 
 function buildBackendUrl(path: string): string {
   return `${BACKEND_BASE_URL}${path}`;
@@ -33,14 +33,14 @@ export async function getTasksFromBackend(): Promise<Task[]> {
   }
 }
 
-export async function updateTaskInBackend(taskId: string, completed: boolean): Promise<Task> {
+export async function updateTaskInBackend(taskId: string, status: TaskStatus): Promise<Task> {
   try {
     const response = await fetch(buildBackendUrl(`/tasks/${taskId}`), {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ completed }),
+      body: JSON.stringify({ status }),
       cache: "no-store",
     });
 
@@ -65,7 +65,8 @@ export async function getActivityFromBackend(): Promise<ActivityLog[]> {
       throw new Error(await parseError(response));
     }
 
-    return (await response.json()) as ActivityLog[];
+    const body = (await response.json()) as ActivityResponse;
+    return body.data;
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : "Failed to load activity logs.");
   }

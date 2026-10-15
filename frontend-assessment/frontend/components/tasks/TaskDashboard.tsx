@@ -1,9 +1,10 @@
 "use client";
 
 import { useTasks } from "@/hooks/useTasks";
-import type { Task } from "@/types/api";
+import type { Task, TaskStatus } from "@/types/api";
 import { StatusFilter } from "@/components/tasks/StatusFilter";
 import { TaskList } from "@/components/tasks/TaskList";
+import { useState, useEffect } from "react";
 
 export function TaskDashboard() {
   const {
@@ -17,8 +18,22 @@ export function TaskDashboard() {
     updateTaskStatus,
   } = useTasks();
 
-  const handleToggle = (task: Task) => {
-    updateTaskStatus(task.id, !task.completed);
+  const [successMessage, setSuccessMessage] = useState("");
+
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
+  const handleStatusChange = async (task: Task, status: TaskStatus) => {
+    const ok = await updateTaskStatus(task.id, status);
+    if (ok) {
+      setSuccessMessage(`Task "${task.title}" updated successfully!`);
+    }
   };
 
   return (
@@ -28,6 +43,12 @@ export function TaskDashboard() {
       </header>
 
       <StatusFilter value={filter} onChange={setFilter} />
+
+      {successMessage ? (
+        <section className="card" style={{ padding: "1rem", borderColor: "#a8d5ba", background: "#f0fdf4" }}>
+          <p style={{ margin: 0, color: "#166534" }}>✓ {successMessage}</p>
+        </section>
+      ) : null}
 
       {loading ? (
         <section className="card" style={{ padding: "1rem" }}>
@@ -45,7 +66,11 @@ export function TaskDashboard() {
       ) : null}
 
       {!loading && !error ? (
-        <TaskList tasks={filteredTasks} updatingTaskId={updatingTaskId} onToggle={handleToggle} />
+        <TaskList
+          tasks={filteredTasks}
+          updatingTaskId={updatingTaskId}
+          onStatusChange={handleStatusChange}
+        />
       ) : null}
     </section>
   );
