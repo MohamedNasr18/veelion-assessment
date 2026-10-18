@@ -7,6 +7,10 @@ function validateTaskPayload(payload) {
     throw new HttpError(400, 'Request body must be an object.');
   }
 
+  if (typeof payload.title === 'string' && payload.title.length > MAX_TITLE_LENGTH) {
+    throw new HttpError(400, `Title cannot exceed ${MAX_TITLE_LENGTH} characters.`);
+  }
+
   const sanitized = sanitizeTaskInput(payload);
 
   if (typeof sanitized.title !== 'string') {
@@ -47,6 +51,10 @@ function validateTaskPayload(payload) {
 function validateTaskUpdate(updates) {
   if (!updates || typeof updates !== 'object' || Array.isArray(updates)) {
     throw new HttpError(400, 'Request body must be an object.');
+  }
+
+  if (typeof updates.title === 'string' && updates.title.length > MAX_TITLE_LENGTH) {
+    throw new HttpError(400, `Title cannot exceed ${MAX_TITLE_LENGTH} characters.`);
   }
 
   const sanitized = sanitizeTaskInput(updates);

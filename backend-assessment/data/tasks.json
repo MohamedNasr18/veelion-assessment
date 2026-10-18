@@ -10,18 +10,18 @@
   {
     "id": "9a749a2d-ec52-415e-b68d-3c16a6ed024d",
     "title": "degraded task",
-    "completed": false,
+    "completed": true,
     "createdAt": "2026-04-08T09:49:54.480Z",
-    "updatedAt": "2026-10-15T14:03:49.025Z",
-    "status": "in-progress"
+    "updatedAt": "2026-10-18T16:57:14.921Z",
+    "status": "done"
   },
   {
     "id": "4398f26b-f527-4eeb-b74c-cd4c0ecc9060",
     "title": "A new task",
-    "completed": true,
+    "completed": false,
     "createdAt": "2026-04-08T10:11:56.354Z",
-    "updatedAt": "2026-10-15T14:51:01.422Z",
-    "status": "done"
+    "updatedAt": "2026-10-18T16:57:25.329Z",
+    "status": "in-progress"
   },
   {
     "id": "5fc568ea-ac84-45b5-8bd3-65125532e49f",

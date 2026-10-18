@@ -52,6 +52,14 @@ async function createNewActivity(activityData) {
     throw new HttpError(400, 'Activity data must be an object.');
   }
 
+  if (typeof activityData.action === 'string' && activityData.action.length > MAX_ACTION_LENGTH) {
+    throw new HttpError(400, `Action cannot exceed ${MAX_ACTION_LENGTH} characters.`);
+  }
+
+  if (typeof activityData.info === 'string' && activityData.info.length > MAX_INFO_LENGTH) {
+    throw new HttpError(400, `Info cannot exceed ${MAX_INFO_LENGTH} characters.`);
+  }
+
   // Sanitize input
   const sanitized = sanitizeActivityInput(activityData);
 
