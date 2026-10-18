@@ -480,8 +480,8 @@ Here are my notes from reviewing the backend and the frontend. I grouped the iss
 
 #### 4. No test files
 
-**Problem:** I couldn't find any tests in the project.
+**Problem:** I couldn't find any tests in the project, backend or frontend.
 
 **Why it matters:** Refactoring is risky without tests, because we can't tell if something broke.
 
-**Fix:** Add Jest and React Testing Library and start with the critical paths, like data fetching and user interactions.
+**Fix:** Added backend unit tests with Node's built-in test runner (`node:test`, no new dependencies). Frontend tests with React Testing Library are a next step.
